@@ -92,7 +92,7 @@ func (b *builder) createGo(instr *ssa.Go) {
 		switch b.Scheduler {
 		case "none", "coroutines":
 			// There are no additional parameters needed for the goroutine start operation.
-		case "tasks":
+		case "tasks", "asyncify":
 			// Add the function pointer as a parameter to start the goroutine.
 			params = append(params, funcPtr)
 		default:
@@ -107,7 +107,7 @@ func (b *builder) createGo(instr *ssa.Go) {
 	paramBundle := b.emitPointerPack(params)
 	var callee, stackSize llvm.Value
 	switch b.Scheduler {
-	case "none", "tasks":
+	case "none", "tasks", "asyncify":
 		callee = b.createGoroutineStartWrapper(funcPtr, prefix, hasContext, instr.Pos())
 		if b.AutomaticStackSize {
 			// The stack size is not known until after linking. Call a dummy
@@ -119,7 +119,7 @@ func (b *builder) createGo(instr *ssa.Go) {
 		} else {
 			// The stack size is fixed at compile time. By emitting it here as a
 			// constant, it can be optimized.
-			if b.Scheduler == "tasks" && b.DefaultStackSize == 0 {
+			if (b.Scheduler == "tasks" || b.Scheduler == "asyncify") && b.DefaultStackSize == 0 {
 				b.addError(instr.Pos(), "default stack size for goroutines is not set")
 			}
 			stackSize = llvm.ConstInt(b.uintptrType, b.DefaultStackSize, false)

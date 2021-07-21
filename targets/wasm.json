@@ -5,6 +5,9 @@
 	"goarch":        "wasm",
 	"linker":        "wasm-ld",
 	"libc":          "wasi-libc",
+	"scheduler":     "asyncify",
+	"gc":            "leaking",
+	"default-stack-size": 2048,
 	"cflags": [
 		"--target=wasm32--wasi",
 		"--sysroot={root}/lib/wasi-libc/sysroot",
@@ -14,6 +17,9 @@
 		"--allow-undefined",
 		"--stack-first",
 		"--no-demangle"
+	],
+	"extra-files": [
+		"src/internal/task/task_asyncify_wasm.S"
 	],
 	"emulator":      ["node", "targets/wasm_exec.js"],
 	"wasm-abi":      "js"

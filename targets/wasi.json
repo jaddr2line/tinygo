@@ -5,6 +5,9 @@
 	"goarch":        "arm",
 	"linker":        "wasm-ld",
 	"libc":          "wasi-libc",
+	"scheduler":     "asyncify",
+	"gc":            "leaking",
+	"default-stack-size": 1000000,
 	"cflags": [
 		"--target=wasm32--wasi",
 		"--sysroot={root}/lib/wasi-libc/sysroot",
@@ -15,6 +18,9 @@
 		"--stack-first",
 		"--export-dynamic",
 		"--no-demangle"
+	],
+	"extra-files": [
+		"src/internal/task/task_asyncify_wasm.S"
 	],
 	"emulator":      ["wasmtime"],
 	"wasm-abi":      "generic"
